@@ -15,8 +15,8 @@ as data attributes, with "x" as LON and "y" as LAT in WGS84.
 \examples{
 data(TN_observations)
 head(TN_observations)
-attr(TN_observations,'x')
-attr(TN_observations,'y')
+head(attr(TN_observations,'x'))
+head(attr(TN_observations,'y'))
 }
 \author{
 Marieke Dirksen

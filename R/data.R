@@ -8,12 +8,29 @@
 #' @usage data(TN_observations)
 #'
 #'
-#' @keywords datasets
+#' @keywords datasets temperature Netherlands
 #' @author Marieke Dirksen
-#' @export
 #' @examples
 #' data(TN_observations)
 #' head(TN_observations)
-#' attr(TN_observations,'x')
-#' attr(TN_observations,'y')
+#' head(attr(TN_observations,'x'))
+#' head(attr(TN_observations,'y'))
 "TN_observations"
+
+#' Specification of the grid parameters with time dimension
+#'
+#' @description Coordinates are stored as data attributes, with "x" as LON and "y" as LAT in WGS84. The time dimension is in months.
+#'
+#' @docType data
+#'
+#' @usage data(sp_grid_nl)
+#'
+#'
+#' @keywords datasets grid Netherlands
+#' @author Marieke Dirksen
+#' @examples
+#' data(sp_grid_nl)
+#' head(attr(sp_grid_nl,'x'))
+#' head(attr(sp_grid_nl,'y'))
+#' head(attr(sp_grid_nl,'time'))
+"sp_grid_nl"
