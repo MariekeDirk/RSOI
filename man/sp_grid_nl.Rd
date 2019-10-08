@@ -20,5 +20,6 @@ head(attr(sp_grid_nl,'time'))
 \author{
 Marieke Dirksen
 }
+\keyword{Netherlands}
 \keyword{datasets}
 \keyword{grid}

@@ -21,4 +21,6 @@ head(attr(TN_observations,'y'))
 \author{
 Marieke Dirksen
 }
+\keyword{Netherlands}
 \keyword{datasets}
+\keyword{temperature}
