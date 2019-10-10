@@ -8,7 +8,7 @@
 #' @usage data(TN_observations)
 #'
 #'
-#' @keywords datasets temperature Netherlands
+#' @keywords datasets temperature Netherlands observation
 #' @author Marieke Dirksen
 #' @examples
 #' data(TN_observations)
@@ -69,3 +69,38 @@
 #' data(ok_NL)
 #' summary(ok_NL)
 "ok_NL"
+
+#' Monthly precipitation observations for Indonesia
+#'
+#' @description This dataset includes monthly precipitation sums for Indonesia since 1930 until 2000. Coordinates are stored
+#' as data attributes, with "x" as LON and "y" as LAT in WGS84.
+#' @docType data
+#'
+#' @usage data(RR_obs)
+#'
+#'
+#' @keywords datasets Indonesia observation precipitation
+#' @author Marieke Dirksen
+#' @examples
+#' data(RR_obs)
+#' head(RR_obs)
+#' head(attr(RR_obs,'x'))
+#' head(attr(RR_obs,'y'))
+"RR_obs"
+
+#' Stations with Monthly precipitation observations for Indonesia
+#'
+#' @description This dataset includes monthly precipitation stations for Indonesia since 1930 until 2000.
+#' @docType data
+#'
+#' @usage data(sp.RR_stations)
+#'
+#'
+#' @keywords datasets Indonesia observation precipitation stations
+#' @author Marieke Dirksen
+#' @examples
+#' library(mapview)
+#' data("sp.RR_stations")
+#' mapview(sp.RR_stations)
+"sp.RR_stations"
+

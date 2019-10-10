@@ -1,3 +1,14 @@
+---
+title: "README"
+author: "Marieke Dirksen"
+date: "October 10, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
 # RSOI
 ## Reduced space optimal interpolation workshop 2019
 
@@ -9,3 +20,9 @@ For an interpolation area the following files need to be prepared:
 * observations for the reconstruction period
 
 
+
+```{r}
+library(mapview)
+data("sp.RR_stations")
+mapview(sp.RR_stations)
+```

@@ -23,4 +23,5 @@ Marieke Dirksen
 }
 \keyword{Netherlands}
 \keyword{datasets}
+\keyword{observation}
 \keyword{temperature}
