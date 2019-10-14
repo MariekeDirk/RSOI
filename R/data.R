@@ -36,25 +36,7 @@
 #' head(attr(TN_reference,'y'))
 "TN_reference"
 
-#' Specification of the grid parameters with time dimension
-#'
-#' @description Coordinates are stored as data attributes, with "x" as LON and "y" as LAT in WGS84. The time dimension is in months.
-#'
-#' @docType data
-#'
-#' @usage data(sp_grid_nl)
-#'
-#'
-#' @keywords datasets grid Netherlands
-#' @author Marieke Dirksen
-#' @examples
-#' data(sp_grid_nl)
-#' head(attr(sp_grid_nl,'x'))
-#' head(attr(sp_grid_nl,'y'))
-#' head(attr(sp_grid_nl,'time'))
-"sp_grid_nl"
-
-#' Reference climatology grid 1990-2017
+#' Reference monthly climatology grid 1990-2017 for Temperature, the Netherlands
 #'
 #' @description raster values interpolated with ordinary kriging, based on daily values.
 #'
@@ -69,6 +51,22 @@
 #' data(ok_NL)
 #' summary(ok_NL)
 "ok_NL"
+
+#' Reference monthly climatology grid 1980-2010 for Precipitation, Indonesia
+#'
+#' @description raster stack object
+#'
+#' @docType data
+#'
+#' @usage data(RR_ref_grid)
+#'
+#'
+#' @keywords datasets grid Indonesia
+#' @author Marieke Dirksen
+#' @examples
+#' data(RR_ref_grid)
+#' summary(RR_ref_grid)
+"RR_ref_grid"
 
 #' Monthly precipitation observations for Indonesia
 #'

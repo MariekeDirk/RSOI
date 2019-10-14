@@ -34,8 +34,22 @@ save(TN_reference,file="data/TN_reference.rda")
 save(TN_observations, file="data/TN_observations.rda")
 
 #Gridded files for RSOI
-ok_NL<-stack("/net/pc150400/nobackup/users/dirksen/data/Temperature/climatology/ok.grd")[[2]] #second layer is the median Temperature
+#daily files
+ok_NL<-lapply(list.files("/net/pc150400/nobackup/users/dirksen/data/Temperature/Aux_results/ok_model/prediction",full.names=TRUE,pattern = ".grd"),stack)
+ok_NL<-stack(ok_NL)
+
+ok_NL_dates<-list.files("/net/pc150400/nobackup/users/dirksen/data/Temperature/Aux_results/ok_model/prediction",pattern = ".grd")
+ok_NL_dates<-gsub("temperature_kriging_pca_harmonie","",ok_NL_dates)
+ok_NL_dates<-gsub(".grd","",ok_NL_dates)
+ok_NL_dates<-format(as.Date(ok_NL_dates),"%Y.%m")
+I<-as.factor(ok_NL_dates)
+
+ok_NL<-stackApply(ok_NL,I,fun="mean",na.rm=TRUE)
+names(ok_NL)<-levels(I)
+ok_NL<-dropLayer(ok_NL,337)
+# ok_NL<-stack("/net/pc150400/nobackup/users/dirksen/data/Temperature/climatology/ok.grd")[[2]] #second layer is the median Temperature
 ok_NL<-projectRaster(ok_NL,crs = CRS("+init=epsg:4326"))
+
 #3 dimensional array with x,y,time
 LON<-coordinates(ok_NL)[,1]
 LAT<-coordinates(ok_NL)[,2]
@@ -47,14 +61,18 @@ attr(sp_grid_nl,"time")<-Zcol
 
 #1)reference grid 1990-2017
 save(ok_NL,file = "data/ok_NL.rda")
-#2)empty grid for the interpolation
-save(sp_grid_nl, file="data/sp_grid_nl.rda")
+#2)empty grid for the interpolation?
+#save(sp_grid_nl, file="data/sp_grid_nl.rda")
 
 ##########################################################################################
 #Precipitation data Indonesia
-obs_dir<-"/net/pc150400/nobackup/users/dirksen/data/Precipitation_Indonesia/forMarieke_1930/"
-meta_dir<-"/net/pc150400/nobackup/users/dirksen/data/Precipitation_Indonesia/station_1930.txt"
+obs_dir<-"/net/pc150400/nobackup/users/dirksen/data/Precipitation_Indonesia/forMarieke_1890/"
+meta_dir<-"/net/pc150400/nobackup/users/dirksen/data/Precipitation_Indonesia/station_1890.txt"
 
+obs_ref_dir<-"/net/pc150400/nobackup/users/dirksen/data/Precipitation_Indonesia/forMarieke_calibration_1980/"
+meta_ref_dir<-"/net/pc150400/nobackup/users/dirksen/data/Precipitation_Indonesia/station_1980.txt"
+
+prepare_indonesia<-function(obs_dir,meta_dir){
 RR_obs<-list.files(path=obs_dir,full.names = TRUE)
 RR_obs<-mapply(data.table::fread,RR_obs,MoreArgs = list(skip=20,header=FALSE,na.string="-9999"),SIMPLIFY = FALSE)
 #RR_obs<-mapply(cbind,RR_obs,"ID"=RR_STAID,SIMPLIFY = FALSE)
@@ -62,8 +80,14 @@ RR_obs<-do.call("rbind",RR_obs)
 names(RR_obs)<-c("ID","Year","Month","RR")
 RR_obs$RR[which(RR_obs$RR<0)]<-NA
 
+
+#get stations for a single year
+# RR_obs<-RR_obs[complete.cases(RR_obs),]
+# RR_obs<-RR_obs[which(RR_obs$Year==1890),]
 IDs<-data.frame(unique(RR_obs$ID));names(IDs)<-"ID"
 #station file contains names and staid -->check if all the ID are similar!
+
+
 stations<-fread(meta_dir)
 names(stations)<-c("ID","name","type","lat","lon","value")
 stations_1930<-merge(stations,IDs,by="ID")
@@ -83,16 +107,21 @@ RR_obs$IT_DATETIME<-format(as.Date(zoo::as.yearmon(paste0(RR_obs$Year,"-",RR_obs
 RR_obs<-subset(RR_obs,select=c(5,1,4))
 RR_obs<-tidyr::spread(RR_obs,ID,RR)
 
-stations.x<-subset(stations_1890,select = c(4))
-stations.y<-subset(stations_1890,select = c(5))
+stations.x<-subset(stations_1930,select = c(4))
+stations.y<-subset(stations_1930,select = c(5))
 
-stations.x<-data.frame(t(stations.x)); colnames(stations.x)<-stations_1930$ID
-stations.y<-data.frame(t(stations.y)); colnames(stations.y)<-stations_1930$ID
+stations.x<-data.frame((stations.x)); rownames(stations.x)<-stations_1930$ID #not transposed so the rownames are the column names of the other table, with the same order
+stations.y<-data.frame((stations.y)); rownames(stations.y)<-stations_1930$ID
 
 attr(RR_obs,"x")<-stations.x
 attr(RR_obs,"y")<-stations.y
+return(RR_obs)
+}
 
+RR_obs<-prepare_indonesia(obs_dir,meta_dir)
+RR_ref<-prepare_indonesia(obs_ref_dir,meta_ref_dir)
 save(RR_obs, file="data/RR_obs.rda")
+save(RR_ref,file="data/RR_ref.rda")
 
 #spatial station data for viewing and exploring purposes
 sp.RR_stations<-stations_1930
@@ -100,8 +129,12 @@ sp.RR_stations$lat<-as.numeric(sp.RR_stations$lat)
 sp.RR_stations$lon<-as.numeric(sp.RR_stations$lon)
 coordinates(sp.RR_stations)<-~lon+lat
 crs(sp.RR_stations)<-CRS("+init=epsg:4326")
-save(sp.RR_stations,file="data/sp.RR_stations.rda")
+save(sp.RR_stations,file="data/sp.RR_stations_1890.rda")
 
+#Gridded data
+RR_ref_grid<-stack("/net/pc150400/nobackup/users/dirksen/data/Precipitation_Indonesia/rr_Indonesia.nc")
+RR_ref_grid[values(RR_ref_grid>4000)]<-NA
+save(RR_ref_grid,file="data/RR_ref_grid.rda")
 #2)observations for the reference period: ....-....
 # t.start<-which(RR_obs$IT_DATETIME=="1990.01")
 # t.stop<-which(RR_obs$IT_DATETIME=="2017.12")

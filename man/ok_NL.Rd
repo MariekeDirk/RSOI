@@ -3,8 +3,8 @@
 \docType{data}
 \name{ok_NL}
 \alias{ok_NL}
-\title{Reference climatology grid 1990-2017}
-\format{An object of class \code{RasterLayer} of dimension 316 x 267 x 1.}
+\title{Reference monthly climatology grid 1990-2017 for Temperature, the Netherlands}
+\format{An object of class \code{RasterBrick} of dimension 334 x 286 x 336.}
 \usage{
 data(ok_NL)
 }
