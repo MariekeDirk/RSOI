@@ -33,6 +33,20 @@ save(TN_reference,file="data/TN_reference.rda")
 #2)observations for the interpolation
 save(TN_observations, file="data/TN_observations.rda")
 
+#spatial data
+sp.TN_stations<-data.frame(STN=as.character(),
+                           lat=as.numeric(),
+                           lon=as.numeric(),
+                           stringsAsFactors=FALSE)
+STN<-colnames(attr(TN_observations,"x"))
+lat<-as.numeric(attr(TN_observations,"x"))
+lon<-as.numeric(attr(TN_observations,"y"))
+df<-data.frame(STN,lat,lon)
+names(df)<-c("STN","lat","lon")
+sp.TN_stations<-rbind(sp.TN_stations,df)
+coordinates(sp.TN_stations)<-~lat+lon
+crs(sp.TN_stations)<-CRS("+init=epsg:4326")
+save(sp.TN_stations,file="data/sp.TN_stations.rda")
 #Gridded files for RSOI
 #daily files
 

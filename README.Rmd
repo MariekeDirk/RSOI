@@ -14,15 +14,41 @@ knitr::opts_chunk$set(echo = TRUE)
 
 For an interpolation area the following files need to be prepared:
 
-* grid for the calibration period (typically 30 year climatology)
 * empty grid layers for each month of the reconstruction period
 * observations for the 30 year reference period
 * observations for the reconstruction period
 
+## An overview of the observations
 
+### Indonesia
 
 ```{r}
 library(mapview)
 data("sp.RR_stations")
 mapview(sp.RR_stations)
+```
+
+### The Netherlands
+
+```{r}
+data("sp.TN_stations")
+mapview(sp.TN_stations)
+
+```
+
+## Datasets in this project
+This project contains meteorological data from two countries: the Netherlands and Indonesia. From the Netherlands temperature observations since 1905 are included. For Indonesia precipitation observations are stored in `data("RR_obs")` starting in the year 1930. 
+
+```{r}
+#load Temperature data for the Netherlands
+data("TN_observations") #observations
+data("TN_reference")    #reference observations
+data("sp_grid_nl")      #empty array
+#data("ok_NL")           #ordinary kriging climatology (not used in RSOI)
+
+#load Precipitation data for Indonesia
+data("RR_obs")          #observations
+data("RR_ref")          #reference observations
+data("sp_grid_ind")     #empty array
+#data("RR_ref_grid")     #reference grid interpolated (not used in RSOI)
 ```
