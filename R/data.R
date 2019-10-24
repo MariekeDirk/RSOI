@@ -52,6 +52,38 @@
 #' summary(ok_NL)
 "ok_NL"
 
+#' Empty array 3D with attributes time,lat and lon for the Netherlands
+#'
+#' @description Empty data array for RSOI
+#'
+#' @docType data
+#'
+#' @usage data(sp_grid_nl)
+#'
+#'
+#' @keywords datasets grid Netherlands array
+#' @author Marieke Dirksen
+#' @examples
+#' data(sp_grid_nl)
+#' summary(sp_grid_nl)
+"sp_grid_nl"
+
+#' Empty array 3D with attributes time,lat and lon for the Indonesia
+#'
+#' @description Empty data array for RSOI
+#'
+#' @docType data
+#'
+#' @usage data(sp_grid_ind)
+#'
+#'
+#' @keywords datasets grid Indonesia array
+#' @author Marieke Dirksen
+#' @examples
+#' data(sp_grid_ind)
+#' summary(sp_grid_ind)
+"sp_grid_ind"
+
 #' Reference monthly climatology grid 1980-2010 for Precipitation, Indonesia
 #'
 #' @description raster stack object
@@ -85,6 +117,24 @@
 #' head(attr(RR_obs,'x'))
 #' head(attr(RR_obs,'y'))
 "RR_obs"
+
+#' Monthly reference precipitation observations for Indonesia
+#'
+#' @description This dataset includes monthly precipitation sums for Indonesia since 1930 until 2000. Coordinates are stored
+#' as data attributes, with "x" as LON and "y" as LAT in WGS84.
+#' @docType data
+#'
+#' @usage data(RR_obs)
+#'
+#'
+#' @keywords datasets Indonesia observation precipitation reference
+#' @author Marieke Dirksen
+#' @examples
+#' data(RR_ref)
+#' head(RR_ref)
+#' head(attr(RR_ref,'x'))
+#' head(attr(RR_ref,'y'))
+"RR_ref"
 
 #' Stations with Monthly precipitation observations for Indonesia
 #'

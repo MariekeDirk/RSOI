@@ -3,7 +3,7 @@ library(lubridate)
 library(tidyr)
 library(raster)
 library(zoo)
-
+calc_months_nl==FALSE
 #TN Netherlands from 1906 until 2019 oct
 TN_observations<-fread("/net/pc150400/nobackup/users/dirksen/data/AWS/TN_monthly_1906_2019.csv")
 TN_observations<-subset(TN_observations,select=c(1,2,3))
@@ -35,10 +35,13 @@ save(TN_observations, file="data/TN_observations.rda")
 
 #Gridded files for RSOI
 #daily files
-ok_NL<-lapply(list.files("/net/pc150400/nobackup/users/dirksen/data/Temperature/Aux_results/ok_model/prediction",full.names=TRUE,pattern = ".grd"),stack)
+
+if(calc_months_nl==TRUE){
+files_loc<-"/net/pc150400/nobackup/users/dirksen/data/Temperature/Aux_results/ok_model/prediction"
+ok_NL<-lapply(list.files(files_loc,full.names=TRUE,pattern = ".grd"),stack)
 ok_NL<-stack(ok_NL)
 
-ok_NL_dates<-list.files("/net/pc150400/nobackup/users/dirksen/data/Temperature/Aux_results/ok_model/prediction",pattern = ".grd")
+ok_NL_dates<-list.files(files_loc,pattern = ".grd")
 ok_NL_dates<-gsub("temperature_kriging_pca_harmonie","",ok_NL_dates)
 ok_NL_dates<-gsub(".grd","",ok_NL_dates)
 ok_NL_dates<-format(as.Date(ok_NL_dates),"%Y.%m")
@@ -47,9 +50,9 @@ I<-as.factor(ok_NL_dates)
 ok_NL<-stackApply(ok_NL,I,fun="mean",na.rm=TRUE)
 names(ok_NL)<-levels(I)
 ok_NL<-dropLayer(ok_NL,337)
-# ok_NL<-stack("/net/pc150400/nobackup/users/dirksen/data/Temperature/climatology/ok.grd")[[2]] #second layer is the median Temperature
 ok_NL<-projectRaster(ok_NL,crs = CRS("+init=epsg:4326"))
-
+}
+ok_NL<-stack("D:/Temperature/ok_monthly.grd")
 #3 dimensional array with x,y,time
 LON<-coordinates(ok_NL)[,1]
 LAT<-coordinates(ok_NL)[,2]
@@ -59,10 +62,10 @@ attr(sp_grid_nl,"x")<-LON
 attr(sp_grid_nl,"y")<-LAT
 attr(sp_grid_nl,"time")<-Zcol
 
-#1)reference grid 1990-2017
+#1)reference grid 1990-2017 4D [value,time,lat,lo]
 save(ok_NL,file = "data/ok_NL.rda")
-#2)empty grid for the interpolation?
-#save(sp_grid_nl, file="data/sp_grid_nl.rda")
+#2)empty grid for the interpolation 3D [time,lat,lon]
+save(sp_grid_nl, file="data/sp_grid_nl.rda")
 
 ##########################################################################################
 #Precipitation data Indonesia
@@ -132,16 +135,33 @@ crs(sp.RR_stations)<-CRS("+init=epsg:4326")
 save(sp.RR_stations,file="data/sp.RR_stations_1890.rda")
 
 #Gridded data
-RR_ref_grid<-stack("/net/pc150400/nobackup/users/dirksen/data/Precipitation_Indonesia/rr_Indonesia.nc")
-RR_ref_grid[values(RR_ref_grid>4000)]<-NA
-save(RR_ref_grid,file="data/RR_ref_grid.rda")
-#2)observations for the reference period: ....-....
-# t.start<-which(RR_obs$IT_DATETIME=="1990.01")
-# t.stop<-which(RR_obs$IT_DATETIME=="2017.12")
-#
-# RR_reference<-RR_obs[t.start:t.stop,]
-# RR_reference<-RR_reference[,-4]
-# save(RR_reference,file="data/RR_reference.rda")
+# RR_ref_grid<-stack("/net/pc150400/nobackup/users/dirksen/data/Precipitation_Indonesia/rr_Indonesia.nc")
+# RR_ref_grid[values(RR_ref_grid>4000)]<-NA
 
-#3)grid for the reference period: ....-....
-#4)empty grid with months to be interpolated
+RR_ref_grid<-stack("D:/Precipitation_Indonesia/RR_ref_grid.grd")
+
+#subset for JAVA
+countries<-readOGR(dsn="D:/natural_earth/ne_10m_admin_1_states_provinces",layer = "ne_10m_admin_1_states_provinces")
+Indonesia <- countries[countries$admin=="Indonesia",]
+Java <- Indonesia[Indonesia$name=="Banten" |
+                    Indonesia$name=="Jawa Barat" |
+                    Indonesia$name=="Jakarta Raya" |
+                    Indonesia$name=="Jawa Tengah" |
+                    Indonesia$name=="Yogyakarta" |
+                    Indonesia$name=="Jawa Timur" |
+                    Indonesia$name=="Lampung",]
+crs(Java)<-CRS("+init=epsg:4326")
+Java<-gBuffer(Java,width = 1)
+RR_ref_grid<-mask(RR_ref_grid,Java)
+
+save(RR_ref_grid,file="data/RR_ref_grid.rda")
+
+LON<-coordinates(RR_ref_grid)[,1]
+LAT<-coordinates(RR_ref_grid)[,2]
+Zcol<-RR_obs$IT_DATETIME
+sp_grid_ind<-array()
+attr(sp_grid_ind,"x")<-LON
+attr(sp_grid_ind,"y")<-LAT
+attr(sp_grid_ind,"time")<-Zcol
+save(sp_grid_ind,file="data/sp_grid_ind.rda")
+
