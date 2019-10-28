@@ -49,6 +49,67 @@ data("sp_grid_nl")      #empty array
 #load Precipitation data for Indonesia
 data("RR_obs")          #observations
 data("RR_ref")          #reference observations
-data("sp_grid_ind")     #empty array
-#data("RR_ref_grid")     #reference grid interpolated (not used in RSOI)
+data("grid_matrix")     #with the dimensions from the raster stack [nrow,ncol,nlayers,fill=values]
+data("RR_ref_grid")     #reference grid interpolated raster(not used in RSOI)
+```
+
+## RSOI prepare: data availability
+We are going to start with the Indonesia data for the analysis. 
+
+```{r ggplot}
+library(gridrsoi)
+library(ggplot2)
+
+RR_obs_count<-subset(RR_obs,select=-IT_DATETIME)
+out<-apply(RR_obs_count,2,FUN=function(x){ as.numeric(!is.na(x))})
+sums_out<-colSums(out)
+
+df.out<-data.frame(RR_obs$IT_DATETIME,out)
+df.out.long<-df.out %>% tidyr::gather(key=stations,value=value,-RR_obs.IT_DATETIME)
+# ggplot(df.out.long,aes(RR_obs.IT_DATETIME,value,fill=value,group=stations))+geom_tile()+
+#   #scale_x_discrete(expand = c(0, 0)) +
+#   scale_y_discrete(expand = c(0, 1)) 
+
+```
+
+## RSOI prepare: PCA analysis
+For the PCA analysis you need a reconstruction on a grid for the reference period. The reconstruction could for example be calculated using ordinary kriging or IDW.  
+
+```{r pca analysis}
+
+trafo <- function(x) {sqrt(x)}
+back.trafo <- function( x) { x[x<0] <- 0; x^2 }
+
+
+RR_pca<-gridrsoi::gridrsoi.prepare(grid=grid_matrix,transf = trafo,back.transf = back.trafo,maxL = 80 )
+
+scree.plot(RR_pca$pca,num.pcs = 10)
+
+
+```
+
+## Reconstruction using RSOI
+Note: reconstruction of Indonesia does not work here since there are missing values in the recontruction period!
+
+```{r reconstruction, eval=FALSE}
+
+
+RR_obs_val<-as.matrix(RR_obs[,2:ncol(RR_obs)])
+attr(RR_obs_val,"dimnames")<-list(as.character(RR_obs$IT_DATETIME),
+                                               names(RR_obs[,2:ncol(RR_obs)]))
+attr(RR_obs_val,"x")<-as.numeric(attr(RR_obs,"x")$lat)
+attr(RR_obs_val,"y")<-as.numeric(attr(RR_obs,"y")$lon)
+
+# RR_ref<-RR_ref[complete.cases(RR_ref),]
+RR_ref_val<-as.matrix(RR_ref[,2:ncol(RR_ref)])
+attr(RR_ref_val,"dimnames")<-list(as.character(RR_ref$IT_DATETIME),names(RR_ref[,2:ncol(RR_ref)]))
+attr(RR_ref_val,"x")<-as.numeric(attr(RR_ref,"x")$lat)
+attr(RR_ref_val,"y")<-as.numeric(attr(RR_ref,"y")$lon)
+
+res<-gridrsoi.reconstruct(stdat.recon = RR_obs_val, 
+                          stdat.calib = RR_ref_val,
+                          preparation = RR_pca,
+                          L = 6,
+                          do.what = c("grid","xval"))
+
 ```

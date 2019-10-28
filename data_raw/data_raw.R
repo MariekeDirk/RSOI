@@ -170,12 +170,19 @@ RR_ref_grid<-mask(RR_ref_grid,Java)
 
 save(RR_ref_grid,file="data/RR_ref_grid.rda")
 
+grid_matrix<-array(values(RR_ref_grid),
+                   dim = c(nrow(RR_ref_grid),ncol(RR_ref_grid),nlayers(RR_ref_grid)))
+
 LON<-coordinates(RR_ref_grid)[,1]
 LAT<-coordinates(RR_ref_grid)[,2]
 Zcol<-RR_obs$IT_DATETIME
-sp_grid_ind<-array()
-attr(sp_grid_ind,"x")<-LON
-attr(sp_grid_ind,"y")<-LAT
-attr(sp_grid_ind,"time")<-Zcol
-save(sp_grid_ind,file="data/sp_grid_ind.rda")
+# sp_grid_ind<-array()
+# attr(sp_grid_ind,"x")<-LON
+# attr(sp_grid_ind,"y")<-LAT
+# attr(sp_grid_ind,"time")<-Zcol
+
+attr(grid_matrix,"x")<-LON
+attr(grid_matrix,"y")<-LAT
+
+save(grid_matrix,file="data/grid_matrix.rda")
 
